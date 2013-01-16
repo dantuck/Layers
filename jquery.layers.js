@@ -17,7 +17,7 @@
     var Layers = function (element, options) {
         this.$element = $(element)
         this.options = options //$.extend({}, $.fn.layers.defaults, options)
-        this.glassOverlay = $('<div class="' + this.options.glassClass + '" />')
+        this.glassOverlay = $('<div class="' + this.options.identifier + ' ' + this.options.glassClass + '" />')
         this.layers = []
  
         this.init()
@@ -31,9 +31,9 @@
           this.activate()  
         }
 
-      , glass: function (on) {
-          var isActive = this.$element.children('.layers.glass').length > 0;
-          if(on || !isActive) {
+      , glass: function (events) {
+          var isActive = this.$element.children('.'+ this.options.identifier +'.' + this.options.glassClass).length > 0;
+          if(!isActive) {
             $(this.glassOverlay)
               .css({ 'background-color':'transparent', 'height':'100%', 'width':'100%', 'position':'absolute', 'top':'0px', 'left':'0px' })
               .on('click.' + this.type + '.glass', function (e) { e.stopPropagation(); })
@@ -47,7 +47,7 @@
           var that = this
 
           $.each( this.options.layers, function ( layer, events ) {
-              that.addLayer(layer, events)
+              that.add(layer, events)
           })
         }
 
@@ -56,34 +56,38 @@
           that.$element.off('.' + this.type).removeData(this.type).find('.' + that.options.identifier).remove()
         }
 
-      , addLayer: function (name, events) {
+      , add: function (name, events) {
           var that = this
 
           if(that.layers[name] === undefined)
             that.options.layers[name] = events
 
-          that.enableLayer(name)
+          if(name.toLowerCase() !== 'glass')
+            that.toggle(name)
+        }
+      , remove: function (name) {
+            this.toggle(name)
+            delete this.layers[name]
+            delete this.options.layers[name]
         }
 
-      , enableLayer: function (name) {
+      , toggle: function (name) {
             var that = this
+            if(name.toLowerCase() === 'glass') return
 
-            $.each(this.options.layers[name], function (e, o) {
-                o.data = o.data ? o.data : ''
+            if(!that.layers[name]) {
+                $.each(this.options.layers[name], function (e, o) {
+                    o.data = o.data ? o.data : ''
 
-                if( o.handler && $.isFunction(o.handler) ) {
-                    if(!that.layers[name]) {
+                    if( o.handler && $.isFunction(o.handler) ) {
                         that.layers[name] = true
                         that.$element.on(e + '.' + that.type + '.' + name, o.data, o.handler)
-                    } else console.log(name + ' has already been added.')
-                }    
-            })
-        }
-
-
-      , disableLayer: function (name) {
-          this.layers[name] = false
-          this.$element.off('.' + this.type + '.' + name)
+                    }    
+                })                    
+            } else { // disable
+                that.layers[name] = false
+                that.$element.off('.' + this.type + '.' + name)
+            }
         }
       
       , disableEvent: function (name, layer) { // layer is optional
@@ -106,16 +110,14 @@
             , data = $this.data('layers')
             , options =  $.extend({}, $.fn.layers.defaults, $this.data(), typeof option == 'object' && option)
 
-            if(args) console.log('we have args')
             if (!data) $this.data('layers', (data = new Layers(this, options)))
-            //if (typeof option == 'string') data[option]()
             if (typeof option == 'string') args ? data[option].apply(data, args) : data[option]()
         })
     }
  
     $.fn.layers.defaults = {
         layers: {}
-        , glassClass: 'layers glass'
+        , glassClass: 'glass'
         , identifier: 'layers'
         , callback: function () {}
     }

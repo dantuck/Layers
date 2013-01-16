@@ -30,27 +30,17 @@ $('.layers').layers({
 
 ## Options
 
+##### layers: {}
+
 Object containing layer definitions.
-	
-	layers
 
+##### glassClass: 'glass'
 
-Glass overlay template
+Glass overlay class
 
-	glassOverlay
-
-Default: 
-```
-<div class="layers glass" />
-```
+##### identifier: 'layers'
 
 Class Identifier that is applied to elements created by layers
-
-	identifier
-
-Default: 
-```layers```
-
 
 
 ## Methods
@@ -71,7 +61,7 @@ $('.layers').layers({
 });
 ```
 
-##### .layers('glass')
+##### .layers('glass', events)
 
 ```js
 $('.layers').layers('glass');
@@ -82,10 +72,10 @@ $('.layers').layers('glass');
 
 ##### .layers('destroy')
 
-##### .layers('addLayer')
+##### .layers('add', name, events)
 
 ```js
-$('.layers').layers('addLayer',
+$('.layers').layers('add',
 	'layer2', { 
 		'mouseleave': { 
 			'handler': function(e) { console.log($(this).offset().left + 'layer3 mouseleave'); } 
@@ -94,19 +84,19 @@ $('.layers').layers('addLayer',
 )
 ```
 
-##### .layers('enableLayer')
+##### .layers('remove', name)
 
 ```js
-$('.layers').layers('enableLayer','layer2')
+$('.layers').layers('remove', 'layer2')
 ```
 
-##### .layers('disableLayer')
+##### .layers('toggle', name)
 
 ```js
-$('.layers').layers('disableLayer','layer2')
+$('.layers').layers('toggleLayer','layer2')
 ```
 
-##### .layers('disableEvent')
+##### .layers('disableEvent', name, layer)
 
 ## License
 
